@@ -4,8 +4,11 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletRequest;
@@ -39,8 +42,8 @@ public class WebUtil {
 	 * @param urlparam 带分隔的url参数
 	 * @return
 	 */
-	public static HashMap<String,String> GetRequestParam(String urlparam){
-		HashMap<String,String> map = new HashMap<String,String>();
+	public static Map<String,String> GetParameterMap(String urlparam){
+		Map<String,String> map = new HashMap<String,String>();
 		String[] param =  urlparam.split("&");
 		for(String keyvalue:param){
 			String[] pair = keyvalue.split("=");
@@ -49,6 +52,24 @@ public class WebUtil {
 			}
 	   }
 	   return map;
+	}
+	
+	public static Map<String,String> GetParameterMap(Map<String,String[]> requestParams){
+		Map<String,String> params = new HashMap<String,String>();
+
+		for (Iterator<String> iter = requestParams.keySet().iterator(); iter.hasNext();) {
+			String name = (String) iter.next();
+			String[] values = (String[]) requestParams.get(name);
+			String valueStr = "";
+			for (int i = 0; i < values.length; i++) {
+				valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
+			}
+			
+			//valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
+			params.put(name, valueStr);
+		}
+		
+		return params;
 	}
 	
 	public static String httpsRequest(String requestUrl, String requestMethod, String outputStr) {
